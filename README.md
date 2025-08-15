@@ -18,6 +18,14 @@ A fun and interactive counter app with pig snort sounds and floating piggy anima
 - Node.js (version 16 or higher)
 - npm or yarn
 
+### Audio Setup
+
+To enable the pig snort sound effects, add the audio file to your project:
+
+1. Create the `public/assets/` directory if it doesn't exist
+2. Add your pig snort audio file: `public/assets/594498__21100206tm__pig-snort.wav`
+3. The app will automatically play this sound when clicking the counter button
+
 ### Installation
 
 1. Clone the repository:

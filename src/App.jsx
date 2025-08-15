@@ -7,55 +7,15 @@ export default function App() {
   const idRef = useRef(0);
   const lastCounts = useRef([]);
 
-  const audioCtx = useRef(null);
-  const getAudio = () => {
-    if (!audioCtx.current) {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (Ctx) audioCtx.current = new Ctx();
-    }
-    return audioCtx.current;
-  };
-
-  // Improved pig snort sound: combines low-frequency oscillators with noise for a deeper, grunty snort
+  const audioRef = useRef(null);
+  
   const playSnort = () => {
-    const ctx = getAudio();
-    if (!ctx) return;
-
-    const duration = 0.4;
-    const rate = ctx.sampleRate;
-    const noiseBuffer = ctx.createBuffer(1, rate * duration, rate);
-    const data = noiseBuffer.getChannelData(0);
-
-    for (let i = 0; i < data.length; i++) {
-      const t = i / rate;
-      const envelope = Math.exp(-5 * t);
-      data[i] = (Math.random() * 2 - 1) * envelope;
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reset to beginning
+      audioRef.current.play().catch(error => {
+        console.log('Audio playback failed:', error);
+      });
     }
-
-    const noiseSource = ctx.createBufferSource();
-    noiseSource.buffer = noiseBuffer;
-
-    const gruntOsc = ctx.createOscillator();
-    gruntOsc.type = "sine";
-    gruntOsc.frequency.setValueAtTime(80, ctx.currentTime);
-    gruntOsc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + duration);
-
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.5, ctx.currentTime);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-
-    const gruntGain = ctx.createGain();
-    gruntGain.gain.setValueAtTime(0.6, ctx.currentTime);
-    gruntGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-
-    noiseSource.connect(noiseGain).connect(ctx.destination);
-    gruntOsc.connect(gruntGain).connect(ctx.destination);
-
-    noiseSource.start();
-    gruntOsc.start();
-
-    noiseSource.stop(ctx.currentTime + duration);
-    gruntOsc.stop(ctx.currentTime + duration);
   };
 
   const spawnPiggies = () => {
@@ -102,6 +62,7 @@ export default function App() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
       <BackgroundDecor />
+      <audio ref={audioRef} src="/assets/594498__21100206tm__pig-snort.wav" preload="auto" />
       <div className="relative z-10 w-full max-w-md p-6 sm:p-8">
         <div className="rounded-3xl shadow-2xl p-8 sm:p-10 bg-gradient-to-br from-pink-100 via-pink-50 to-pink-200 backdrop-blur-md border border-pink-300/80 shadow-pink-200">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-center mb-6 select-none bg-gradient-to-r from-pink-500 via-pink-600 to-pink-700 bg-clip-text text-transparent">
